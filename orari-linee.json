@@ -1,0 +1,81 @@
+{
+  "_nota": "Linee e cadenzamenti. I tempi fra fermate NON stanno qui: sono in tempi-percorrenza.json. L'ordine delle linee è quello della legenda. Il campo 'colore' rimanda a una variabile CSS definita nell'HTML.",
+  "orePunta": [
+    { "da": "06:00", "a": "09:30" },
+    { "da": "16:00", "a": "20:00" }
+  ],
+  "linee": [
+    {
+      "id": "L1",
+      "nome": "L1 Tirrenica",
+      "colore": "var(--c1)",
+      "numeroBase": 9100,
+      "fermate": ["Trapani", "Palermo Punta Raisi ✈", "Palermo Centrale", "Cefalù", "Milazzo", "Messina Centrale"],
+      "cadenza": 60,
+      "andata":  { "prima": "05:40", "ultima": "21:40" },
+      "ritorno": { "prima": "05:10", "ultima": "21:10" }
+    },
+    {
+      "id": "L2",
+      "nome": "L2 Dorsale",
+      "colore": "var(--c2)",
+      "numeroBase": 9200,
+      "fermate": ["Palermo Punta Raisi ✈", "Palermo Centrale", "Enna–Caltanissetta", "Catania Centrale", "Catania Fontanarossa ✈"],
+      "cadenza": 60,
+      "cadenzaPunta": 30,
+      "andata":  { "prima": "05:00", "ultima": "22:00" },
+      "ritorno": { "prima": "05:15", "ultima": "22:15" }
+    },
+    {
+      "id": "L3",
+      "nome": "L3 Ionica",
+      "colore": "var(--c3)",
+      "numeroBase": 9300,
+      "fermate": ["Messina Centrale", "Taormina–Giardini", "Catania Centrale", "Catania Fontanarossa ✈", "Siracusa", "Ragusa", "Comiso ✈", "Gela"],
+      "cadenza": 60,
+      "andata":  { "prima": "05:30", "ultima": "21:30" },
+      "ritorno": { "prima": "05:00", "ultima": "20:00" }
+    },
+    {
+      "id": "L4",
+      "nome": "L4 Occidentale",
+      "colore": "var(--c4)",
+      "numeroBase": 9400,
+      "fermate": ["Trapani", "Trapani Birgi ✈", "Marsala", "Agrigento"],
+      "cadenza": 120,
+      "andata":  { "prima": "06:00", "ultima": "20:00" },
+      "ritorno": { "prima": "06:30", "ultima": "20:30" }
+    },
+    {
+      "id": "L5",
+      "nome": "L5 Sicana",
+      "colore": "var(--c5)",
+      "numeroBase": 9500,
+      "fermate": ["Palermo Centrale", "Agrigento"],
+      "cadenza": 60,
+      "andata":  { "prima": "06:10", "ultima": "21:10" },
+      "ritorno": { "prima": "06:00", "ultima": "21:00" }
+    },
+    {
+      "id": "L6",
+      "nome": "L6 Meridionale",
+      "colore": "var(--c6)",
+      "numeroBase": 9600,
+      "fermate": ["Catania Centrale", "Caltagirone", "Gela", "Agrigento"],
+      "cadenza": 120,
+      "andata":  { "prima": "06:20", "ultima": "20:20" },
+      "ritorno": { "prima": "07:00", "ultima": "21:00" }
+    },
+    {
+      "id": "L7",
+      "nome": "L7 Ponte sullo Stretto 💫",
+      "colore": "var(--c7)",
+      "numeroBase": 9700,
+      "fermate": ["Messina Centrale", "Reggio Calabria"],
+      "cadenza": 30,
+      "sogno": true,
+      "andata":  { "prima": "05:20", "ultima": "22:20" },
+      "ritorno": { "prima": "05:35", "ultima": "22:35" }
+    }
+  ]
+}

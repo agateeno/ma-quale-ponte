@@ -1,0 +1,36 @@
+{
+  "_nota": "Tempi di percorrenza fra fermate adiacenti, in minuti. Unica fonte per i minuti sulla mappa e per gli orari delle linee: se cambi un valore qui, cambiano entrambi.",
+  "cambioMinimo": 8,
+  "tratte": [
+    { "linea": "L1", "da": "Trapani",                 "a": "Palermo Punta Raisi ✈",   "minuti": 30 },
+    { "linea": "L1", "da": "Palermo Punta Raisi ✈",   "a": "Palermo Centrale",        "minuti": 12 },
+    { "linea": "L1", "da": "Palermo Centrale",        "a": "Cefalù",                  "minuti": 22 },
+    { "linea": "L1", "da": "Cefalù",                  "a": "Milazzo",                 "minuti": 50 },
+    { "linea": "L1", "da": "Milazzo",                 "a": "Messina Centrale",        "minuti": 15 },
+
+    { "linea": "L2", "da": "Palermo Punta Raisi ✈",   "a": "Palermo Centrale",        "minuti": 12 },
+    { "linea": "L2", "da": "Palermo Centrale",        "a": "Enna–Caltanissetta",      "minuti": 45 },
+    { "linea": "L2", "da": "Enna–Caltanissetta",      "a": "Catania Centrale",        "minuti": 32 },
+    { "linea": "L2", "da": "Catania Centrale",        "a": "Catania Fontanarossa ✈",  "minuti": 8  },
+
+    { "linea": "L3", "da": "Messina Centrale",        "a": "Taormina–Giardini",       "minuti": 22 },
+    { "linea": "L3", "da": "Taormina–Giardini",       "a": "Catania Centrale",        "minuti": 28 },
+    { "linea": "L3", "da": "Catania Centrale",        "a": "Catania Fontanarossa ✈",  "minuti": 8  },
+    { "linea": "L3", "da": "Catania Fontanarossa ✈",  "a": "Siracusa",                "minuti": 30 },
+    { "linea": "L3", "da": "Siracusa",                "a": "Ragusa",                  "minuti": 45 },
+    { "linea": "L3", "da": "Ragusa",                  "a": "Comiso ✈",                "minuti": 10 },
+    { "linea": "L3", "da": "Comiso ✈",                "a": "Gela",                    "minuti": 20 },
+
+    { "linea": "L4", "da": "Trapani",                 "a": "Trapani Birgi ✈",         "minuti": 8  },
+    { "linea": "L4", "da": "Trapani Birgi ✈",         "a": "Marsala",                 "minuti": 10 },
+    { "linea": "L4", "da": "Marsala",                 "a": "Agrigento",               "minuti": 55 },
+
+    { "linea": "L5", "da": "Palermo Centrale",        "a": "Agrigento",               "minuti": 55 },
+
+    { "linea": "L6", "da": "Catania Centrale",        "a": "Caltagirone",             "minuti": 35 },
+    { "linea": "L6", "da": "Caltagirone",             "a": "Gela",                    "minuti": 22 },
+    { "linea": "L6", "da": "Gela",                    "a": "Agrigento",               "minuti": 45 },
+
+    { "linea": "L7", "da": "Messina Centrale",        "a": "Reggio Calabria",         "minuti": 12 }
+  ]
+}

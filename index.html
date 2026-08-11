@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma quale ponte — Rete AV Sicilia</title>
+<style>
+  :root{
+    --paper:#F2EFE8; --card:#ffffff; --ink:#14161a; --muted:#6a6f78; --line:#d9d4c9;
+    --soft:#f4f1ea; --dim:#DCD8CE; --dimtx:#BFBBB1; --halo:#ffffff;
+    --sea:#CDE3EE; --land:#ffffff; --coast:#93BED2;
+    --pinP:#0d6b33; --pinA:#B3341A; --flow:#ffffff;
+    --c1:#E32119; --c2:#00A040; --c3:#F2B705; --c4:#0064B4; --c5:#9B4F96; --c6:#F07E26; --c7:#00A6A6;
+  }
+  [data-theme="dark"]{
+    --paper:#0F1114; --card:#181B1F; --ink:#E9E7E2; --muted:#98A0A9; --line:#2B3138;
+    --soft:#20242A; --dim:#2E343B; --dimtx:#525963; --halo:#181B1F;
+    --sea:#0D2833; --land:#181B1F; --coast:#1E4655;
+    --pinP:#22A35A; --pinA:#E0553A; --flow:#F2F0EB;
+    --c1:#F0483C; --c2:#22BC62; --c3:#F6C948; --c4:#3E93E0; --c5:#C176BC; --c6:#F79A4E; --c7:#2CD1D1;
+  }
+  [data-cb="1"]{ --c1:#D55E00; --c2:#009E73; --c3:#DDCC00; --c4:#0072B2; --c5:#CC79A7; --c6:#56B4E9; --c7:#3A3A3A; }
+  [data-cb="1"][data-theme="dark"]{ --c1:#F07A22; --c2:#20BE92; --c3:#E8D53C; --c4:#4A9FE0; --c5:#E093C2; --c6:#7FC9F2; --c7:#D0D0D0; }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;padding:26px 18px 48px;
+       transition:background .25s,color .25s}
+  .wrap{max-width:1060px;margin:0 auto}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .eyebrow{font-size:11px;font-weight:600;letter-spacing:2.2px;color:var(--muted);text-transform:uppercase}
+  h1{font-size:31px;font-weight:800;letter-spacing:-.4px;margin:8px 0 0}
+  .rule{height:2px;background:var(--ink);margin:16px 0 22px;width:220px}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;padding-top:4px}
+  .tool{display:flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--card);
+    border-radius:999px;padding:8px 14px;font-family:inherit;font-size:12.5px;font-weight:700;
+    color:var(--ink);cursor:pointer;transition:.15s}
+  .tool:hover{border-color:var(--ink)}
+
+  .panel{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:20px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .fl{font-size:11px;font-weight:800;letter-spacing:1.4px;color:var(--muted);
+      margin-bottom:7px;text-transform:uppercase;display:block}
+  .swapwrap{display:flex;justify-content:center;gap:10px;margin:16px 0}
+  button.pill{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 18px;
+    font-size:13px;font-weight:700;font-family:inherit;color:var(--ink);cursor:pointer;transition:.15s}
+  button.pill:hover{border-color:var(--ink)}
+  .hint{font-size:12px;color:var(--muted);margin-top:7px;font-weight:500}
+
+  .seg{display:flex;background:var(--soft);border-radius:10px;padding:4px;gap:4px}
+  .seg button{flex:1;border:0;background:transparent;font-family:inherit;font-size:13px;font-weight:700;
+    color:var(--muted);padding:9px 6px;border-radius:7px;cursor:pointer;transition:.16s;white-space:nowrap}
+  .seg button.on{background:var(--ink);color:var(--card)}
+
+  .cs,.tp{position:relative}
+  .cs-btn,.tp-btn{width:100%;display:flex;align-items:center;gap:10px;padding:12px 13px;background:var(--card);
+    border:1.5px solid var(--line);border-radius:10px;cursor:pointer;font-family:inherit;
+    font-size:15px;font-weight:700;color:var(--ink);text-align:left;transition:.15s}
+  .cs-btn:hover,.tp-btn:hover{border-color:var(--muted)}
+  .cs.open .cs-btn,.tp.open .tp-btn{border-color:var(--ink);box-shadow:0 0 0 3px rgba(128,128,128,.16)}
+  .cs-btn.empty .cs-val{color:var(--muted);font-weight:600}
+  .cs-val{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cs-chev{font-size:10px;color:var(--muted);transition:transform .2s}
+  .cs.open .cs-chev,.tp.open .cs-chev{transform:rotate(180deg)}
+  .cs-tick{display:flex;gap:3px;flex:0 0 auto}
+  .cs-tick i{width:5px;height:14px;border-radius:3px;display:block}
+  .cs-pop,.tp-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;right:0;background:var(--card);
+    border:1.5px solid var(--ink);border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.18);
+    padding:10px;display:none;animation:popIn .16s ease-out}
+  .cs.open .cs-pop,.tp.open .tp-pop{display:block}
+  @keyframes popIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .cs-search{width:100%;padding:9px 11px;font-family:inherit;font-size:14px;font-weight:600;background:var(--card);
+    color:var(--ink);border:1.5px solid var(--line);border-radius:8px;outline:none;margin-bottom:8px}
+  .cs-list{max-height:250px;overflow-y:auto}
+  .cs-opt{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;
+    font-size:14.5px;font-weight:600}
+  .cs-opt:hover{background:var(--soft)}
+  .cs-opt.sel{background:var(--ink);color:var(--card)}
+  .cs-opt .nm{flex:1}
+  .cs-none{padding:12px 10px;color:var(--muted);font-size:13.5px;font-weight:600}
+  .tp-val{flex:1;font-size:22px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+  .tp-pop{padding:14px}
+  .tp-sec{font-size:10px;font-weight:800;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin:0 0 7px}
+  .tp-grid{display:grid;gap:5px;margin-bottom:13px;grid-template-columns:repeat(6,1fr)}
+  .tp-cell{padding:8px 0;text-align:center;border-radius:7px;cursor:pointer;font-size:13.5px;
+    font-weight:700;background:var(--soft);font-variant-numeric:tabular-nums;transition:.12s}
+  .tp-cell:hover{filter:brightness(.95)}
+  .tp-cell.on{background:var(--ink);color:var(--card)}
+  .tp-foot{display:flex;gap:8px;border-top:1px dashed var(--line);padding-top:11px}
+  .tp-chip{flex:1;padding:7px 0;text-align:center;border-radius:999px;background:var(--soft);cursor:pointer;
+    font-size:12.5px;font-weight:700}
+
+  /* mappa */
+  .mapcard{margin-top:20px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px 14px 10px}
+  .maptop{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:2px 6px 10px}
+  .maptitle{font-size:11px;font-weight:800;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase}
+  .maproute{font-size:13.5px;font-weight:700}
+  /* aspect-ratio esplicito: Safari altrimenti calcola l'altezza dal contenuto del disegno */
+  .mapbox{position:relative;overflow:hidden;border-radius:8px;background:var(--card);
+    aspect-ratio:1200/730;width:100%}
+  svg#net{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+  svg#net.drag{cursor:grabbing}
+  .zoom{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:5px}
+  .zoom button{width:34px;height:34px;border:1.5px solid var(--line);background:var(--card);border-radius:9px;
+    font-size:16px;font-weight:800;font-family:inherit;color:var(--ink);cursor:pointer;line-height:1}
+  .zoom button:hover{border-color:var(--ink)}
+  .zoom button.sm{font-size:12px}
+
+  .sea-w{fill:var(--sea)} .land{fill:var(--land);stroke:var(--coast);stroke-width:2.5;stroke-linejoin:round}
+  [data-sea="0"] #sea{display:none}
+  .edge{fill:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .3s,stroke-width .3s}
+  .edge[data-line="L1"]{stroke:var(--c1)} .edge[data-line="L2"]{stroke:var(--c2)}
+  .edge[data-line="L3"]{stroke:var(--c3)} .edge[data-line="L4"]{stroke:var(--c4)}
+  .edge[data-line="L5"]{stroke:var(--c5)} .edge[data-line="L6"]{stroke:var(--c6)}
+  .edge[data-line="L7"]{stroke:var(--c7)}
+  /* easter egg: tutto ciò che riguarda il ponte compare solo col sogno attivo */
+  [data-dream="0"] .dream{display:none}
+  .bridge .deck{stroke:var(--coast);stroke-width:12;stroke-linecap:round}
+  .bridge .pyl{stroke:var(--coast);stroke-width:3.5;stroke-linecap:round}
+  .bridge .cab{fill:none;stroke:var(--coast);stroke-width:2;stroke-linecap:round}
+  .edge.dim{stroke:var(--dim) !important;stroke-width:6}
+  .edge.on{stroke-width:11}
+  .edge.alt{stroke-width:7;stroke-dasharray:3 12;opacity:.9}
+  .flow{fill:none;stroke:var(--flow);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:.92;
+    stroke-dasharray:13 31;animation:flow 1.15s linear infinite}
+  @keyframes flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-44}}
+  .hit{fill:transparent;cursor:pointer}
+  .mk{fill:var(--card);stroke:var(--ink);stroke-width:3;transition:stroke .3s;pointer-events:none}
+  .mk[data-line="L1"]{stroke:var(--c1)} .mk[data-line="L2"]{stroke:var(--c2)}
+  .mk[data-line="L3"]{stroke:var(--c3)} .mk[data-line="L4"]{stroke:var(--c4)}
+  .mk[data-line="L5"]{stroke:var(--c5)} .mk[data-line="L6"]{stroke:var(--c6)}
+  .mk[data-line="L7"]{stroke:var(--c7)}
+  .mk.dim{stroke:var(--dim) !important}
+  .lb{font-size:16px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--halo);stroke-width:4;
+      stroke-linejoin:round;transition:fill .3s;pointer-events:none}
+  .lb.b{font-size:17.5px;font-weight:800}
+  .lb.dim{fill:var(--dimtx) !important}
+  .tm{font-size:13.5px;font-weight:800;fill:var(--muted);paint-order:stroke;stroke:var(--halo);stroke-width:4;
+      stroke-linejoin:round;transition:opacity .3s;pointer-events:none}
+  .tm.hide{opacity:0}
+  .pin-ring{animation:ripple 1.5s ease-out 2;transform-box:fill-box;transform-origin:center}
+  .pin-body{animation:pinPop .42s cubic-bezier(.2,1.5,.45,1) both;transform-box:fill-box;transform-origin:center}
+  @keyframes pinPop{0%{transform:scale(.1);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
+  @keyframes ripple{0%{transform:scale(.7);opacity:.5}100%{transform:scale(2.6);opacity:0}}
+  [data-anim="0"] .flow,[data-anim="0"] .pin-ring,[data-anim="0"] .pin-body{animation:none}
+  [data-anim="0"] .pin-ring{display:none}
+  @media (prefers-reduced-motion:reduce){.flow,.pin-ring,.pin-body{animation:none}}
+
+  .legend{display:flex;flex-wrap:wrap;align-items:center;gap:7px 16px;padding:10px 6px 4px;
+    border-top:1px dashed var(--line);margin-top:8px}
+  .lgi{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;transition:opacity .25s}
+  .lgi.dim{opacity:.3}
+  .lgs{width:24px;height:7px;border-radius:4px;background:var(--x)}
+  .lgi.alt .lgs{border-radius:0;background:repeating-linear-gradient(to right,
+    var(--x) 0 3px, transparent 3px 8px)}
+  .lgi.alt{opacity:.85}
+  .lgnote{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.3px;margin-left:auto}
+
+  /* risultati */
+  .result{margin-top:20px}
+  .card{background:var(--card);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+  .empty{padding:28px 20px;color:var(--muted);font-weight:600;font-size:14px;
+    background:var(--card);border:1.5px solid var(--line);border-radius:12px}
+  .sum{display:flex;flex-wrap:wrap;gap:22px 34px;align-items:flex-end;padding:20px}
+  .res2{display:grid;grid-template-columns:1.08fr .92fr;gap:20px;margin-top:20px;align-items:start}
+  @media(max-width:900px){.res2{grid-template-columns:1fr}}
+  .listcard{overflow:visible}
+  .listcard .row:last-of-type{border-radius:0 0 11px 11px}
+  .listcard .more{border-radius:0 0 11px 11px}
+  .detail{position:sticky;top:20px}
+  @media(max-width:900px){.detail{position:static}}
+  .caplab{font-size:11px;font-weight:800;letter-spacing:1.4px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+  .big{font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums}
+  .big.hl{color:var(--pinP)}
+  .badge{display:inline-block;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:800}
+  .neutral{background:var(--soft);color:var(--muted)}
+  .ok{background:color-mix(in srgb,var(--pinP) 18%,transparent);color:var(--pinP)}
+
+  .tth{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;gap:12px;flex-wrap:wrap}
+  .tth .t{font-size:11px;font-weight:800;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase}
+  .sort{display:flex;align-items:center;gap:9px}
+  .sort .sl{font-size:11px;font-weight:800;letter-spacing:1.2px;color:var(--muted);text-transform:uppercase}
+  .sortsel{position:relative;min-width:160px}
+  .sortsel .cs-btn{padding:8px 12px;font-size:13.5px}
+  .sortsel .cs-pop{left:auto;right:0;min-width:190px}
+  .row{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;
+    padding:14px 20px;border-top:1px solid var(--line);cursor:pointer;transition:background .15s}
+  .row:hover{background:var(--soft)}
+  .row.on{background:var(--soft)}
+  .times{display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+  .tt-h{font-size:22px;font-weight:800;letter-spacing:-.5px}
+  .tt-dash{flex:1;min-width:26px;height:2px;background:var(--line)}
+  .row.on .tt-dash{background:var(--ink)}
+  .mid{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .mid .d{font-size:13px;font-weight:800;color:var(--muted)}
+  .mid .w{color:var(--pinA)}
+  .mid .v{font-size:12px;font-weight:600;color:var(--muted);opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .trainids{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+  .tid{font-size:10.5px;font-weight:800;letter-spacing:.4px;padding:3px 7px;border-radius:4px;color:#fff}
+  .badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+  .fast{font-size:10px;font-weight:800;letter-spacing:1px;background:color-mix(in srgb,var(--pinP) 18%,transparent);
+    color:var(--pinP);padding:3px 8px;border-radius:999px;text-transform:uppercase;white-space:nowrap}
+  .pork{font-size:10px;font-weight:800;letter-spacing:.5px;background:#F8D7E2;color:#8E2A50;
+    padding:3px 8px;border-radius:999px;white-space:nowrap}
+  [data-theme="dark"] .pork{background:#4A2233;color:#F3B9CC}
+  .more{width:100%;padding:13px;background:var(--card);border:0;border-top:1px solid var(--line);
+    font-family:inherit;font-size:13px;font-weight:800;color:var(--ink);cursor:pointer}
+  .more:hover{background:var(--soft)}
+  .legs{padding:12px 20px 18px;border-top:1px solid var(--line)}
+  .tl-row{display:grid;grid-template-columns:46px 22px 1fr;gap:10px;align-items:stretch}
+  .tl-t{font-size:12.5px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;
+    text-align:right;align-self:center}
+  .tl-rail{position:relative;min-height:22px}
+  .tl-rail::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;
+    background:var(--lc);border-radius:3px}
+  .tl-row.first .tl-rail::before{top:calc(50% - 1px)}
+  .tl-row.last .tl-rail::before{bottom:calc(50% - 1px)}
+  .tl-dot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;
+    width:14px;height:14px;border-radius:50%;background:var(--card);border:4px solid var(--lc)}
+  .tl-row.mid .tl-dot{width:8px;height:8px;border-width:2.5px}
+  .tl-row.mid .tl-t{font-weight:600;opacity:.7}
+  .tl-n{font-size:14.5px;font-weight:700;padding:8px 0;align-self:center}
+  .tl-row.mid .tl-n{font-size:13px;font-weight:600;color:var(--muted);padding:5px 0}
+  .tl-meta{font-size:11.5px;font-weight:800;letter-spacing:.4px;padding:0 0 9px;align-self:center}
+  .tl-row.chg .tl-rail::before{background:repeating-linear-gradient(to bottom,
+    var(--line) 0 5px, transparent 5px 11px);width:5px;margin-left:-2.5px}
+  .tl-w{font-size:12px;font-weight:700;color:var(--pinA);padding:10px 0;align-self:center}
+  footer{font-size:11.5px;color:var(--muted);opacity:.8;margin-top:18px;line-height:1.6;font-weight:500}
+
+  /* modale */
+  .modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+  .modal[hidden]{display:none}
+  .mbd{position:absolute;inset:0;background:rgba(10,12,14,.55)}
+  .mpanel{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+    width:min(760px,100%);max-height:86vh;display:flex;flex-direction:column;
+    box-shadow:0 24px 60px rgba(0,0,0,.3);animation:popIn .18s ease-out}
+  .mhead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;
+    border-bottom:1.5px solid var(--line)}
+  .mhead h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.2px}
+  .mx{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;width:32px;height:32px;
+    font-size:14px;cursor:pointer;font-family:inherit;font-weight:800}
+  .mx:hover{border-color:var(--ink)}
+  .mbody{padding:18px 20px 24px;overflow-y:auto}
+  .srow{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:14px 0;
+    border-bottom:1px dashed var(--line);flex-wrap:wrap}
+  .srow:last-child{border-bottom:0}
+  .sname{font-size:14.5px;font-weight:700}
+  .sdesc{font-size:12px;color:var(--muted);font-weight:500;margin-top:3px;max-width:340px}
+  .srow .seg{flex:0 0 auto;min-width:230px}
+  .srow .seg button{font-size:12px;padding:8px 10px}
+
+  .lncard{border:1.5px solid var(--line);border-radius:11px;padding:14px 16px;margin-bottom:14px}
+  .lnhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .lndot{width:26px;height:8px;border-radius:4px}
+  .lnname{font-size:15.5px;font-weight:800}
+  .lnmeta{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px}
+  table.tt{width:100%;border-collapse:collapse;font-size:13px}
+  table.tt th{text-align:left;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);
+    font-weight:800;padding:4px 6px;border-bottom:1px solid var(--line)}
+  table.tt td{padding:6px;border-bottom:1px dashed var(--line);font-weight:600}
+  table.tt td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}
+  table.tt tr:last-child td{border-bottom:0}
+  .deps{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .dep{font-size:11px;font-weight:700;background:var(--soft);padding:3px 7px;border-radius:5px;
+    font-variant-numeric:tabular-nums}
+  .infobody h3{font-size:14px;font-weight:800;margin:20px 0 6px;letter-spacing:.2px}
+  .infobody h3:first-child{margin-top:0}
+  .infobody p,.infobody li{font-size:13.5px;line-height:1.65;color:var(--ink);font-weight:500}
+  .infobody ul{padding-left:20px;margin:6px 0}
+  .infobody p+p{margin-top:10px}
+  .infobody a{color:var(--pinP);font-weight:700;text-decoration:underline;text-underline-offset:2px}
+  .infobody a:hover{text-decoration-thickness:2px}
+  .todo{border-left:3px solid var(--c3);background:var(--soft);padding:12px 14px;border-radius:0 8px 8px 0;
+    font-size:13px;font-weight:600;color:var(--muted);margin:8px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Ma quale ponte · rete AV Sicilia, orario di progetto</div>
+      <h1>Trova il tuo treno</h1>
+    </div>
+    <div class="tools">
+      <button class="tool" id="btnLines">▤ Linee e orari</button>
+      <button class="tool" id="btnSet">⚙ Impostazioni</button>
+      <button class="tool" id="btnInfo">ⓘ Info</button>
+    </div>
+  </div>
+  <div class="rule"></div>
+
+  <div class="panel">
+    <div class="grid">
+      <div><span class="fl">Stazione di partenza</span><div class="cs" id="csFrom"></div></div>
+      <div><span class="fl">Stazione di arrivo</span><div class="cs" id="csTo"></div></div>
+    </div>
+    <div class="swapwrap">
+      <button class="pill" id="swap">⇅ Inverti tratta</button>
+      <button class="pill" id="reset">↺ Azzera</button>
+    </div>
+    <div class="grid">
+      <div>
+        <span class="fl">Vincolo di orario</span>
+        <div class="seg" id="seg">
+          <button data-m="dep" class="on">Parto alle</button>
+          <button data-m="arr">Arrivo entro le</button>
+        </div>
+        <div class="hint" id="segHint">Ti mostro i treni in partenza da quell'ora in poi.</div>
+      </div>
+      <div><span class="fl" id="tLabel">Ora di partenza</span><div class="tp" id="tpTime"></div></div>
+    </div>
+  </div>
+
+  <div class="mapcard">
+    <div class="maptop">
+      <div class="maptitle">Schema della rete</div>
+      <div class="maproute" id="maproute"></div>
+    </div>
+    <div class="mapbox">
+      <svg id="net" viewBox="130 70 1200 730" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="zoom">
+        <button id="zin" title="Ingrandisci">+</button>
+        <button id="zout" title="Riduci">−</button>
+        <button id="zres" class="sm" title="Reimposta">⤢</button>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <footer>
+    Rete e orario di progetto, non esistenti allo stato attuale. Trascina la mappa per spostarla,
+    rotellina o pulsanti per lo zoom, clic sulle stazioni per sceglierle.
+  </footer>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="mbd" id="mbd"></div>
+  <div class="mpanel">
+    <div class="mhead"><h2 id="mtitle"></h2><button class="mx" id="mclose">✕</button></div>
+    <div class="mbody" id="mbody"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════ DATI ESTERNI ══════════
+   Linee, cadenzamenti e tempi di percorrenza stanno in due JSON accanto a questo file.
+   Qui restano solo la geometria dello schema (tracciati, coordinate, etichette) e il codice. */
+const DATA = {orari:"orari-linee.json", tempi:"tempi-percorrenza.json"};
+
+/* ══════════ RETE ══════════ */
+/* n = nome, v = colore (variabile CSS), dream = esiste solo col sogno attivo.
+   Riempito da orari-linee.json all'avvio. */
+const LINES = {};
+
+/* Nessun tempo qui: il campo m di ogni tratta arriva da tempi-percorrenza.json. */
+const EDGES = [
+  {a:"Trapani", b:"Palermo Punta Raisi ✈", l:"L1", p:[[303,306],[410,306],[473,243]], tp:[357,329,"middle"]},
+  {a:"Palermo Punta Raisi ✈", b:"Palermo Centrale", l:"L1", p:[[473,243],[505,275],[520,275]], tp:[476,277,"middle"]},
+  {a:"Palermo Centrale", b:"Cefalù", l:"L1", p:[[520,275],[550,305],[717,305]], tp:[634,328,"middle"]},
+  {a:"Cefalù", b:"Milazzo", l:"L1", p:[[717,305],[850,305],[875,280],[1023,280],[1059,244]], tp:[949,301,"middle"]},
+  {a:"Milazzo", b:"Messina Centrale", l:"L1", p:[[1059,244],[1121,244],[1143,222]], tp:[1090,264,"middle"]},
+  {a:"Palermo Punta Raisi ✈", b:"Palermo Centrale", l:"L2", p:[[467,252],[475,252],[507,284],[514,284]], tp:[498,246,"end"]},
+  {a:"Palermo Centrale", b:"Enna–Caltanissetta", l:"L2", p:[[520,275],[552,275],[732,455],[763,455]], tp:[629,383,"middle"]},
+  {a:"Enna–Caltanissetta", b:"Catania Centrale", l:"L2", p:[[763,455],[874,455],[886,467],[996,467]], tp:[819,442,"middle"]},
+  {a:"Catania Centrale", b:"Catania Fontanarossa ✈", l:"L2", p:[[1006,472],[1006,495],[999,502],[999,525]], tp:[988,489,"end"]},
+  {a:"Messina Centrale", b:"Taormina–Giardini", l:"L3", p:[[1143,222],[1143,237],[1056,324],[1056,338]], tp:[1112,298,"middle"]},
+  {a:"Taormina–Giardini", b:"Catania Centrale", l:"L3", p:[[1056,338],[1056,373],[996,433],[996,467]], tp:[1039,421,"middle"]},
+  {a:"Catania Centrale", b:"Catania Fontanarossa ✈", l:"L3", p:[[996,467],[996,490],[989,497],[989,520]], tp:[1014,484,"start"]},
+  {a:"Catania Fontanarossa ✈", b:"Siracusa", l:"L3", p:[[989,520],[989,545],[1056,612],[1056,637]], tp:[1010,596,"middle"]},
+  {a:"Siracusa", b:"Ragusa", l:"L3", p:[[1056,637],[1006,637],[961,682],[912,682]], tp:[996,677,"middle"]},
+  {a:"Ragusa", b:"Comiso ✈", l:"L3", p:[[912,682],[909,682],[884,657],[881,657]], tp:[892,641,"middle"]},
+  {a:"Comiso ✈", b:"Gela", l:"L3", p:[[881,657],[857,657],[812,612],[788,612]], tp:[822,652,"middle"]},
+  {a:"Trapani", b:"Trapani Birgi ✈", l:"L4", p:[[303,306],[303,317],[293,327],[293,338]], tp:[317,314,"start"]},
+  {a:"Trapani Birgi ✈", b:"Marsala", l:"L4", p:[[293,338],[293,346],[289,350],[289,358]], tp:[305,349,"start"]},
+  {a:"Marsala", b:"Agrigento", l:"L4", p:[[289,358],[368,437],[470,437],[569,536],[594,536]], tp:[419,425,"middle"]},
+  {a:"Palermo Centrale", b:"Agrigento", l:"L5", p:[[520,275],[520,369],[594,443],[594,536]], tp:[544,424,"middle"]},
+  {a:"Catania Centrale", b:"Caltagirone", l:"L6", p:[[996,467],[976,467],[873,570],[854,570]], tp:[912,511,"middle"]},
+  {a:"Caltagirone", b:"Gela", l:"L6", p:[[854,570],[842,570],[800,612],[788,612]], tp:[808,583,"middle"]},
+  {a:"Gela", b:"Agrigento", l:"L6", p:[[788,612],[729,612],[653,536],[594,536]], tp:[704,566,"middle"]},
+  {a:"Messina Centrale", b:"Reggio Calabria", l:"L7", p:[[1143,222],[1143,223],[1177,257],[1177,258]], tp:[1173,232,"middle"]}
+];
+
+const NODES = [
+  {n:"Trapani", x:303, y:306, int:1, lab:[{t:"TRAPANI",x:287,y:311,a:"end",b:1}]},
+  {n:"Trapani Birgi ✈", x:293, y:338, l:"L4", lab:[{t:"Trapani Birgi ✈",x:277,y:343,a:"end"}]},
+  {n:"Marsala", x:289, y:358, l:"L4", lab:[{t:"Marsala",x:273,y:363,a:"end"}]},
+  {n:"Palermo Punta Raisi ✈", x:473, y:243, cap:124, lab:[{t:"Palermo Punta Raisi ✈",x:489,y:239,a:"start",r:-45}]},
+  {n:"Palermo Centrale", x:520, y:275, cap:124, lab:[{t:"PALERMO CENTRALE",x:538,y:271,a:"start",r:-45,b:1}]},
+  {n:"Cefalù", x:717, y:305, l:"L1", lab:[{t:"Cefalù",x:733,y:301,a:"start",r:-45}]},
+  {n:"Milazzo", x:1059, y:244, l:"L1", lab:[{t:"Milazzo",x:1075,y:240,a:"start",r:-45}]},
+  {n:"Messina Centrale", x:1143, y:222, int:1, lab:[{t:"MESSINA CENTRALE",x:1161,y:228,a:"start",b:1}]},
+  {n:"Enna–Caltanissetta", x:763, y:455, l:"L2", lab:[{t:"Enna–Caltanissetta",x:763,y:418,a:"middle"}]},
+  {n:"Taormina–Giardini", x:1056, y:338, l:"L3", lab:[{t:"Taormina–Giardini",x:1073,y:344,a:"start"}]},
+  {n:"Catania Centrale", x:996, y:467, cap:27, lab:[{t:"CATANIA CENTRALE",x:1018,y:467,a:"start",b:1}]},
+  {n:"Catania Fontanarossa ✈", x:989, y:520, cap:27, lab:[{t:"Catania Fontanarossa ✈",x:1011,y:526,a:"start"}]},
+  {n:"Siracusa", x:1056, y:637, l:"L3", lab:[{t:"SIRACUSA",x:1073,y:643,a:"start",b:1}]},
+  {n:"Ragusa", x:912, y:682, l:"L3", lab:[{t:"Ragusa",x:912,y:708,a:"middle"}]},
+  {n:"Comiso ✈", x:881, y:657, l:"L3", lab:[{t:"Comiso ✈",x:864,y:662,a:"end"}]},
+  {n:"Agrigento", x:594, y:536, int:1, lab:[{t:"AGRIGENTO",x:594,y:564,a:"middle",b:1}]},
+  {n:"Gela", x:788, y:612, int:1, lab:[{t:"GELA",x:788,y:594,a:"middle",b:1}]},
+  {n:"Caltagirone", x:854, y:570, l:"L6", lab:[{t:"Caltagirone",x:871,y:576,a:"start"}]},
+  {n:"Reggio Calabria", x:1177, y:258, l:"L7", dream:1, lab:[{t:"Reggio Calabria",x:1194,y:264,a:"start"}]}
+];
+
+/* Coste reali in proiezione equirettangolare (parallelo di riferimento 37.5°):
+   nessuna deformazione, le stazioni stanno alle loro coordinate geografiche. */
+const COAST = [
+  [284,291],[300,271],[328,247],[349,233],[368,256],[391,287],[413,278],
+  [436,233],[448,244],[453,231],[476,226],[493,224],[510,231],[527,251],
+  [552,262],[569,265],[579,254],[595,287],[623,301],[652,294],[674,290],
+  [715,281],[751,290],[794,278],[836,272],[879,263],[919,244],[953,251],
+  [983,247],[1015,251],[1046,229],[1056,201],[1068,226],[1095,226],[1126,215],
+  [1154,204],[1177,203],[1173,229],[1153,244],[1140,262],[1126,281],[1106,312],
+  [1089,333],[1078,349],[1061,372],[1051,394],[1041,437],[1027,458],[1019,474],
+  [1009,505],[1018,519],[1041,548],[1058,573],[1062,594],[1075,616],[1083,652],
+  [1058,669],[1032,689],[1025,727],[1032,768],[1012,766],[987,762],[950,755],
+  [907,748],[865,734],[845,716],[828,693],[802,662],[780,635],[737,623],
+  [692,619],[652,594],[618,573],[574,553],[533,533],[493,512],[447,476],
+  [396,466],[362,460],[328,451],[308,423],[288,398],[269,372],[261,353],
+  [266,333],[274,322],[266,303],[274,287]
+];
+/* Catmull–Rom chiuso → Bézier cubiche: la costa risulta continua, senza spigoli */
+function smoothClosed(pts, t){
+  const n = pts.length;
+  let d = "M" + pts[0][0] + "," + pts[0][1];
+  for (let i = 0; i < n; i++){
+    const p0 = pts[(i-1+n)%n], p1 = pts[i], p2 = pts[(i+1)%n], p3 = pts[(i+2)%n];
+    const c1 = [p1[0] + (p2[0]-p0[0])/6*t, p1[1] + (p2[1]-p0[1])/6*t];
+    const c2 = [p2[0] - (p3[0]-p1[0])/6*t, p2[1] - (p3[1]-p1[1])/6*t];
+    d += " C" + c1[0].toFixed(1) + "," + c1[1].toFixed(1) + " " +
+                c2[0].toFixed(1) + "," + c2[1].toFixed(1) + " " + p2[0] + "," + p2[1];
+  }
+  return d + " Z";
+}
+const SICILIA = smoothClosed(COAST, 0.5);
+
+/* Calabria, stesso reticolo della Sicilia: costa tirrenica da Tortora al Capo Vaticano,
+   punta dell'Aspromonte, costa ionica fino alla Sibaritide, confine del Pollino.
+   Quel che eccede il riquadro viene ritagliato dalla vista. */
+const CALABRIA = smoothClosed([
+  [1220,-397],[1217,-350],[1225,-304],[1248,-257],[1271,-218],[1285,-189],[1293,-146],
+  [1299,-107],[1316,-71],[1344,-35],[1325,18],[1305,43],[1271,54],[1228,76],
+  [1256,101],[1254,136],[1234,169],[1217,194],[1197,208],[1174,219],[1176,240],
+  [1178,276],[1176,313],[1205,327],[1254,322],[1282,324],[1293,321],[1308,304],
+  [1322,265],[1350,215],[1364,197],[1396,161],[1438,136],[1441,83],[1435,47],
+  [1447,15],[1521,-32],[1589,-68],[1603,-89],[1597,-139],[1546,-204],[1489,-257],
+  [1447,-304],[1418,-332],[1427,-372],[1438,-461],[1362,-436],[1291,-411],[1248,-400]
+], 0.5);
+
+/* Spezzata con angoli arrotondati, alla maniera delle mappe metropolitane */
+const RAD = 17;
+function roundPath(pts){
+  if (pts.length < 3) return "M" + pts.map(p => p[0] + "," + p[1]).join(" L");
+  let d = "M" + pts[0][0] + "," + pts[0][1];
+  for (let i = 1; i < pts.length - 1; i++){
+    const p0 = pts[i-1], p1 = pts[i], p2 = pts[i+1];
+    const v1 = [p0[0]-p1[0], p0[1]-p1[1]], v2 = [p2[0]-p1[0], p2[1]-p1[1]];
+    const l1 = Math.hypot(v1[0],v1[1]), l2 = Math.hypot(v2[0],v2[1]);
+    const r = Math.min(RAD, l1/2, l2/2);
+    const a = [p1[0]+v1[0]/l1*r, p1[1]+v1[1]/l1*r];
+    const b = [p1[0]+v2[0]/l2*r, p1[1]+v2[1]/l2*r];
+    d += " L" + a[0].toFixed(1) + "," + a[1].toFixed(1) +
+         " Q" + p1[0] + "," + p1[1] + " " + b[0].toFixed(1) + "," + b[1].toFixed(1);
+  }
+  const last = pts[pts.length-1];
+  return d + " L" + last[0] + "," + last[1];
+}
+
+let CHANGE = 8;                                    // coincidenza minima, da tempi-percorrenza.json
+const XY = {}; NODES.forEach(n => XY[n.n] = n);
+const STATIONS = NODES.map(n => n.n).slice().sort((a,b) => a.localeCompare(b,"it"));
+const STN_LINES = {};
+EDGES.forEach(e => [e.a,e.b].forEach(s => (STN_LINES[s] = STN_LINES[s] || new Set()).add(e.l)));
+const ekey = (l,a,b) => l + "|" + [a,b].sort().join("|");
+const EDGE_BY = {}; EDGES.forEach(e => EDGE_BY[ekey(e.l,e.a,e.b)] = e);
+
+/* ══════════ CADENZAMENTI ══════════ */
+const H = (h,m) => h*60 + (m||0);
+/* "07:45" → minuti dalla mezzanotte */
+function hm(s){
+  const m = /^(\d{1,2}):(\d{2})$/.exec(String(s).trim());
+  if (!m) throw new Error('Orario non valido: "' + s + '" (atteso HH:MM)');
+  return +m[1]*60 + +m[2];
+}
+
+const SERVICE = {};                                // riempito da orari-linee.json + tempi-percorrenza.json
+const TRAINS = [];                                 // tutte le corse della giornata, generate dai cadenzamenti
+const TRAIN_BY = {};
+let PEAK = [];
+const isPeak = t => PEAK.some(w => t >= w.da && t < w.a);
+
+/* Tempi di percorrenza: dal file alle tratte della mappa e agli hop delle linee. */
+function loadTempi(tempi){
+  if (!tempi || !Array.isArray(tempi.tratte)) throw new Error("tempi-percorrenza.json: manca l'elenco 'tratte'.");
+  if (tempi.cambioMinimo != null) CHANGE = +tempi.cambioMinimo;
+  const M = {};
+  tempi.tratte.forEach(t => {
+    if (!(+t.minuti > 0)) throw new Error("Tempo non valido per " + t.linea + " " + t.da + " → " + t.a);
+    M[ekey(t.linea, t.da, t.a)] = +t.minuti;
+  });
+  EDGES.forEach(e => {
+    const k = ekey(e.l, e.a, e.b);
+    if (M[k] === undefined)
+      throw new Error("tempi-percorrenza.json: manca la tratta " + e.l + " " + e.a + " → " + e.b);
+    e.m = M[k];
+  });
+  return M;
+}
+
+/* Linee e cadenzamenti: gli hop si ricavano dalle fermate consecutive, non si dichiarano due volte. */
+function loadOrari(orari, M){
+  if (!orari || !Array.isArray(orari.linee)) throw new Error("orari-linee.json: manca l'elenco 'linee'.");
+  PEAK = (orari.orePunta || []).map(w => ({da:hm(w.da), a:hm(w.a)}));
+  orari.linee.forEach(l => {
+    LINES[l.id] = {n:l.nome, v:l.colore, dream:!!l.sogno};
+    SERVICE[l.id] = {
+      num: l.numeroBase,
+      stops: l.fermate.slice(),
+      hop: l.fermate.slice(1).map((s,i) => {
+        const k = ekey(l.id, l.fermate[i], s);
+        if (M[k] === undefined)
+          throw new Error("La linea " + l.id + " ferma a " + l.fermate[i] + " e " + s +
+                          ", ma in tempi-percorrenza.json quella tratta non esiste.");
+        return M[k];
+      }),
+      every: l.cadenza,
+      peak: l.cadenzaPunta || 0,
+      fwd: hm(l.andata.prima),  fwdEnd: hm(l.andata.ultima),
+      bwd: hm(l.ritorno.prima), bwdEnd: hm(l.ritorno.ultima)
+    };
+  });
+}
+
+function buildTrains(){
+  TRAINS.length = 0;
+  Object.keys(SERVICE).forEach(k => {
+    const S0 = SERVICE[k];
+    [1,-1].forEach(dir => {
+      const stops = dir === 1 ? S0.stops : S0.stops.slice().reverse();
+      const hop   = dir === 1 ? S0.hop   : S0.hop.slice().reverse();
+      let t = dir === 1 ? S0.fwd : S0.bwd;
+      const end = dir === 1 ? S0.fwdEnd : S0.bwdEnd;
+      let i = 0;
+      while (t <= end){
+        const seq = [], idx = {}; let c = t;
+        stops.forEach((s,j) => { if (j) c += hop[j-1]; idx[s] = j; seq.push({n:s, t:c}); });
+        TRAINS.push({id:"AV " + (S0.num + i*2 + (dir === 1 ? 0 : 1)), line:k, dir, seq, idx});
+        t += (S0.peak && isPeak(t)) ? S0.peak : S0.every;
+        i++;
+      }
+    });
+  });
+  TRAINS.forEach(t => TRAIN_BY[t.id] = t);
+}
+const trainsFor = (line,from,to) => TRAINS
+  .filter(tr => tr.line === line && tr.idx[from] !== undefined && tr.idx[to] !== undefined && tr.idx[from] < tr.idx[to])
+  .map(tr => ({tr, dep:tr.seq[tr.idx[from]].t, arr:tr.seq[tr.idx[to]].t}))
+  .sort((a,b) => a.dep - b.dep);
+
+/* ══════════ GRAFO ══════════ */
+const GRAPH = {};
+function buildGraph(){                             // dopo loadTempi: serve il campo m delle tratte
+  Object.keys(GRAPH).forEach(k => delete GRAPH[k]);
+  EDGES.forEach(e => {
+    (GRAPH[e.a] = GRAPH[e.a] || []).push({to:e.b, m:e.m, l:e.l});
+    (GRAPH[e.b] = GRAPH[e.b] || []).push({to:e.a, m:e.m, l:e.l});
+  });
+}
+function route(from, to, banned){
+  if (!from || !to || from === to) return null;
+  const key = (s,l) => s + "|" + l;
+  const dist = {}, prev = {}, seen = {};
+  const start = key(from,"-");
+  dist[start] = {cost:0, st:from, ln:"-"};
+  const pq = [[0, start]];
+  while (pq.length){
+    pq.sort((a,b) => a[0] - b[0]);
+    const [cost, cur] = pq.shift();
+    if (seen[cur]) continue; seen[cur] = true;
+    const {st, ln} = dist[cur];
+    if (st === to){
+      const legs = []; let k = cur;
+      while (prev[k]){ legs.unshift(prev[k].edge); k = prev[k].from; }
+      return {total:cost, legs};
+    }
+    (GRAPH[st] || []).forEach(e => {
+      if (LINES[e.l].dream && !CFG.dream) return;      // il ponte esiste solo nel sogno
+      if (banned && banned.has(ekey(e.l, st, e.to))) return;
+      const pen = (ln !== "-" && ln !== e.l) ? CHANGE : 0;
+      const nc = cost + e.m + pen, nk = key(e.to, e.l);
+      if (!dist[nk] || nc < dist[nk].cost){
+        dist[nk] = {cost:nc, st:e.to, ln:e.l};
+        prev[nk] = {from:cur, edge:{from:st, to:e.to, m:e.m, l:e.l}};
+        pq.push([nc, nk]);
+      }
+    });
+  }
+  return null;
+}
+const sig = r => r.legs.map(l => ekey(l.l,l.from,l.to)).join(">");
+function patterns(from, to){
+  const best = route(from, to);
+  if (!best) return [];
+  if (!CFG.alts) return [best];
+  const out = [best], seen = new Set([sig(best)]);
+  best.legs.forEach(l => {
+    const alt = route(from, to, new Set([ekey(l.l,l.from,l.to)]));
+    if (alt && !seen.has(sig(alt)) && alt.total <= best.total + 95){ seen.add(sig(alt)); out.push(alt); }
+  });
+  return out.sort((a,b) => a.total - b.total).slice(0,3);
+}
+function ridesOf(r){
+  const rides = [];
+  r.legs.forEach(l => {
+    const last = rides[rides.length-1];
+    if (last && last.line === l.l && last.to === l.from) last.to = l.to;
+    else rides.push({line:l.l, from:l.from, to:l.to});
+  });
+  return rides;
+}
+const viaOf = r => { const mid = r.legs.slice(1).map(l => l.from);
+  return mid.length ? "via " + mid.map(s => s.replace(/ ✈$/,"").split("–")[0]).join(", ") : "diretto"; };
+
+function dailyServices(from, to){
+  const pats = patterns(from, to), out = [], seenKey = new Set();
+  pats.forEach((pat, pi) => {
+    const rides = ridesOf(pat);
+    trainsFor(rides[0].line, rides[0].from, rides[0].to).forEach(first => {
+      let t = first.dep; const legs = []; let ok = true;
+      rides.forEach((rd, i) => {
+        if (!ok) return;
+        const min = i === 0 ? first.dep : t + CHANGE;
+        const cand = trainsFor(rd.line, rd.from, rd.to).find(x => x.dep >= min);
+        if (!cand){ ok = false; return; }
+        legs.push({id:cand.tr.id, line:rd.line, from:rd.from, to:rd.to, dep:cand.dep, arr:cand.arr});
+        t = cand.arr;
+      });
+      if (!ok || !legs.length) return;
+      const key = legs.map(l => l.id).join("-");
+      if (seenKey.has(key)) return;
+      seenKey.add(key);
+      const wait = legs.reduce((s,l,i) => i ? s + (l.dep - legs[i-1].arr) : 0, 0);
+      out.push({key, pi, pat, legs, wait, dep:legs[0].dep, arr:t, dur:t - legs[0].dep});
+    });
+  });
+  return out.sort((a,b) => a.dep - b.dep || a.arr - b.arr);
+}
+
+const hhmm  = m => Math.floor(Math.abs(m)/60) + "h" + String(Math.abs(m)%60).padStart(2,"0");
+const short = m => m >= 60 ? hhmm(m) : m + " min";
+const toStr = m => { const v = ((m%1440)+1440)%1440;
+  return String(Math.floor(v/60)).padStart(2,"0") + ":" + String(v%60).padStart(2,"0"); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ══════════ IMPOSTAZIONI ══════════ */
+const store = {
+  get(){ try { return JSON.parse(localStorage.getItem("avsicilia") || "{}"); } catch(e){ return {}; } },
+  set(v){ try { localStorage.setItem("avsicilia", JSON.stringify(v)); } catch(e){} }
+};
+const CFG = Object.assign({theme:"system", cb:0, sea:1, times:"idle", alts:1, anim:1, dream:0}, store.get());
+const mqDark = window.matchMedia("(prefers-color-scheme: dark)");
+function applyCfg(){
+  const dark = CFG.theme === "dark" || (CFG.theme === "system" && mqDark.matches);
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  document.documentElement.dataset.cb = CFG.cb ? "1" : "0";
+  document.documentElement.dataset.sea = CFG.sea ? "1" : "0";
+  document.documentElement.dataset.anim = CFG.anim ? "1" : "0";
+  document.documentElement.dataset.dream = CFG.dream ? "1" : "0";
+  store.set(CFG);
+}
+mqDark.addEventListener("change", () => { if (CFG.theme === "system") applyCfg(); });
+
+const S = {from:"", to:"", mode:"dep", time:H(8,0), selKey:null, limit:7, sort:"dur", pork:Math.random()};
+
+/* ══════════ CONTROLLI ══════════ */
+const closePops = () => document.querySelectorAll(".cs.open,.tp.open").forEach(o => o.classList.remove("open"));
+document.addEventListener("click", closePops);
+
+function makeSelect(el, onPick){
+  el.innerHTML = '<button class="cs-btn empty" type="button"><span class="cs-tick"></span>' +
+    '<span class="cs-val">— Seleziona —</span><span class="cs-chev">▼</span></button>' +
+    '<div class="cs-pop"><input class="cs-search" placeholder="Cerca stazione…"><div class="cs-list"></div></div>';
+  const btn = el.querySelector(".cs-btn"), search = el.querySelector(".cs-search"), list = el.querySelector(".cs-list");
+  let value = "";
+  const dots = s => [...STN_LINES[s]].sort().map(l => '<i style="background:' + LINES[l].v + '"></i>').join("");
+  function fill(q){
+    const f = STATIONS.filter(s => (CFG.dream || s !== "Reggio Calabria") &&
+      s.toLowerCase().includes((q||"").toLowerCase()));
+    list.innerHTML = f.length ? f.map(s => '<div class="cs-opt' + (s === value ? " sel" : "") +
+      '" data-v="' + esc(s) + '"><span class="nm">' + esc(s) + '</span><span class="cs-tick">' +
+      dots(s) + '</span></div>').join("") : '<div class="cs-none">Nessuna stazione trovata.</div>';
+  }
+  btn.addEventListener("click", e => { e.stopPropagation();
+    const was = el.classList.contains("open");
+    closePops(); if (!was){ el.classList.add("open"); search.value = ""; fill(""); search.focus(); }
+  });
+  search.addEventListener("input", () => fill(search.value));
+  list.addEventListener("click", e => {
+    const o = e.target.closest(".cs-opt"); if (!o) return;
+    api.set(o.dataset.v); el.classList.remove("open"); onPick(o.dataset.v);
+  });
+  el.addEventListener("click", e => e.stopPropagation());
+  const api = { set(v){ value = v || "";
+    btn.classList.toggle("empty", !value);
+    btn.querySelector(".cs-val").textContent = value || "— Seleziona —";
+    btn.querySelector(".cs-tick").innerHTML = value ? dots(value) : "";
+  }};
+  api.set(""); return api;
+}
+function makeTime(el, value, onPick){
+  const mins = [0,5,10,15,20,25,30,35,40,45,50,55];
+  el.innerHTML = '<button class="tp-btn" type="button"><span>🕘</span><span class="tp-val"></span>' +
+    '<span class="cs-chev">▼</span></button><div class="tp-pop"><div class="tp-sec">Ora</div><div class="tp-grid">' +
+    [...Array(24).keys()].map(h => '<div class="tp-cell" data-h="' + h + '">' + String(h).padStart(2,"0") + '</div>').join("") +
+    '</div><div class="tp-sec">Minuti</div><div class="tp-grid">' +
+    mins.map(m => '<div class="tp-cell" data-m="' + m + '">' + String(m).padStart(2,"0") + '</div>').join("") +
+    '</div><div class="tp-foot">' + [[360,"06:00"],[480,"08:00"],[780,"13:00"],[1080,"18:00"]].map(x =>
+      '<div class="tp-chip" data-set="' + x[0] + '">' + x[1] + '</div>').join("") + '</div></div>';
+  const btn = el.querySelector(".tp-btn"), val = el.querySelector(".tp-val");
+  let v = value;
+  function paint(){
+    val.textContent = toStr(v);
+    el.querySelectorAll("[data-h]").forEach(c => c.classList.toggle("on", +c.dataset.h === Math.floor(v/60)));
+    el.querySelectorAll("[data-m]").forEach(c => c.classList.toggle("on", +c.dataset.m === v % 60));
+  }
+  btn.addEventListener("click", e => { e.stopPropagation();
+    const was = el.classList.contains("open"); closePops(); if (!was) el.classList.add("open"); });
+  el.addEventListener("click", e => { e.stopPropagation();
+    const h = e.target.closest("[data-h]"), m = e.target.closest("[data-m]"), s = e.target.closest("[data-set]");
+    if (s){ v = +s.dataset.set; paint(); onPick(v); el.classList.remove("open"); return; }
+    if (h){ v = (v % 60) + (+h.dataset.h) * 60; paint(); onPick(v); }
+    if (m){ v = Math.floor(v/60) * 60 + (+m.dataset.m); paint(); onPick(v); }
+  });
+  paint(); return {set(nv){ v = nv; paint(); }};
+}
+
+/* ══════════ MAPPA ══════════ */
+const $net = document.getElementById("net");
+function buildMap(){                               // dopo il caricamento: servono LINES e i minuti delle tratte
+  const dcls = x => x ? " dream" : "";
+  let s = '<g id="sea"><rect class="sea-w" x="-700" y="-600" width="3400" height="2400"></rect>' +
+          '<path class="land" d="' + SICILIA + '"></path>' +
+          '<path class="land dream" d="' + CALABRIA + '"></path></g>';
+  /* ponte sospeso stilizzato, teso fra le due coste reali dello Stretto */
+  s += '<g class="bridge dream" transform="translate(1145,227) rotate(45)">' +
+       '<line class="deck" x1="0" y1="0" x2="50" y2="0"></line>' +
+       '<line class="pyl" x1="15" y1="-17" x2="15" y2="7"></line>' +
+       '<line class="pyl" x1="35" y1="-17" x2="35" y2="7"></line>' +
+       '<path class="cab" d="M0,0 Q7,-13 15,-17 M15,-17 Q25,-3 35,-17 M35,-17 Q43,-13 50,0"></path></g>';
+  EDGES.forEach(e => s += '<path class="edge' + dcls(LINES[e.l].dream) + '" data-line="' + e.l +
+    '" data-edge="' + esc(ekey(e.l,e.a,e.b)) + '" d="' + roundPath(e.p) + '"></path>');
+  s += '<path id="flow" class="flow" d=""></path>';
+  NODES.forEach(n => { const q = esc(n.n), d = dcls(n.dream);
+    if (n.cap) s += '<rect class="mk' + d + '" data-stn="' + q + '" x="' + (n.x-16) + '" y="' + (n.y-9) +
+      '" width="32" height="18" rx="9" transform="rotate(' + n.cap + ' ' + n.x + ' ' + n.y + ')"></rect>';
+    else if (n.int) s += '<circle class="mk' + d + '" data-stn="' + q + '" cx="' + n.x + '" cy="' + n.y + '" r="10"></circle>';
+    else s += '<circle class="mk' + d + '" data-stn="' + q + '" data-line="' + n.l + '" cx="' + n.x + '" cy="' + n.y +
+      '" r="5.5" stroke-width="3.2"></circle>';
+  });
+  s += '<g id="pins"></g><g id="train"></g>';
+  EDGES.forEach(e => s += '<text class="tm' + dcls(LINES[e.l].dream) + '" data-tm="' + esc(ekey(e.l,e.a,e.b)) +
+    '" x="' + e.tp[0] + '" y="' + e.tp[1] + '" text-anchor="' + e.tp[2] + '">' + e.m + "'</text>");
+  NODES.forEach(n => n.lab.forEach(L => {
+    const txt = '<text class="lb' + (L.b ? " b" : "") + dcls(n.dream) + '" data-stn="' + esc(n.n) + '" x="' + L.x +
+      '" y="' + L.y + '" text-anchor="' + L.a + '">' + esc(L.t) + '</text>';
+    s += L.r ? '<g transform="rotate(' + L.r + ' ' + n.x + ' ' + n.y + ')">' + txt + '</g>' : txt;
+  }));
+  s += '<text class="tm dream" x="1176" y="196">Ponte sullo Stretto</text>';
+  NODES.forEach(n => s += '<circle class="hit' + dcls(n.dream) + '" data-hit="' + esc(n.n) +
+    '" cx="' + n.x + '" cy="' + n.y + '" r="22"></circle>');
+  $net.innerHTML = '<g id="cam">' + s + '</g>';
+  $cam   = document.getElementById("cam");
+  $flow  = document.getElementById("flow");
+  $train = document.getElementById("train");
+}
+
+const VB = [130,70,1200,730], cam = {k:1, x:0, y:0};
+let $cam = null;                                   // il gruppo camera nasce con buildMap()
+const applyCam = () => $cam && $cam.setAttribute("transform",
+  "translate(" + cam.x + "," + cam.y + ") scale(" + cam.k + ")");
+function svgPt(cx, cy){
+  const r = $net.getBoundingClientRect();
+  return {x: VB[0] + (cx - r.left)/r.width * VB[2], y: VB[1] + (cy - r.top)/r.height * VB[3]};
+}
+function zoomAt(p, k2){
+  k2 = Math.min(6, Math.max(.7, k2));
+  cam.x = p.x - (p.x - cam.x) * (k2/cam.k);
+  cam.y = p.y - (p.y - cam.y) * (k2/cam.k);
+  cam.k = k2; applyCam();
+}
+const centerPt = () => ({x:VB[0]+VB[2]/2, y:VB[1]+VB[3]/2});
+document.getElementById("zin").onclick  = () => zoomAt(centerPt(), cam.k * 1.4);
+document.getElementById("zout").onclick = () => zoomAt(centerPt(), cam.k / 1.4);
+document.getElementById("zres").onclick = () => { cam.k = 1; cam.x = 0; cam.y = 0; applyCam(); };
+$net.addEventListener("wheel", e => { e.preventDefault();
+  zoomAt(svgPt(e.clientX, e.clientY), cam.k * (e.deltaY < 0 ? 1.18 : 1/1.18)); }, {passive:false});
+$net.addEventListener("dblclick", () => { cam.k = 1; cam.x = 0; cam.y = 0; applyCam(); });
+
+const ptrs = new Map(); let drag = null, moved = 0, pinch = null;
+$net.addEventListener("pointerdown", e => {
+  ptrs.set(e.pointerId, e);
+  if (ptrs.size === 1){ drag = {p:svgPt(e.clientX,e.clientY), x:cam.x, y:cam.y}; moved = 0; $net.classList.add("drag"); }
+  else if (ptrs.size === 2){ const [a,b] = [...ptrs.values()];
+    pinch = {d:Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY) || 1, k:cam.k}; drag = null; }
+});
+window.addEventListener("pointermove", e => {
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.set(e.pointerId, e);
+  if (pinch && ptrs.size === 2){
+    const [a,b] = [...ptrs.values()];
+    zoomAt(svgPt((a.clientX+b.clientX)/2, (a.clientY+b.clientY)/2),
+      pinch.k * Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY) / pinch.d);
+    return;
+  }
+  if (drag){
+    const p = svgPt(e.clientX, e.clientY);
+    const dx = p.x - drag.p.x, dy = p.y - drag.p.y;
+    moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+    cam.x = drag.x + dx; cam.y = drag.y + dy; applyCam();
+  }
+});
+["pointerup","pointercancel"].forEach(ev => window.addEventListener(ev, e => {
+  ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null;
+  if (ptrs.size === 0){ drag = null; $net.classList.remove("drag"); }
+}));
+
+const $legend = document.getElementById("legend");
+function buildLegend(){
+  $legend.innerHTML = Object.keys(LINES).map(k =>
+    '<div class="lgi' + (LINES[k].dream ? " dream" : "") + '" data-line="' + k + '">' +
+    '<span class="lgs" style="--x:' + LINES[k].v + '"></span>' + esc(LINES[k].n) + '</div>').join("") +
+    '<span class="lgnote" id="lgnote"></span>';
+}
+
+let pinSig = "";
+function drawPins(){
+  const key = S.from + "»" + S.to;
+  if (key === pinSig) return;
+  pinSig = key;
+  let s = "";
+  [[S.from,"P","var(--pinP)"],[S.to,"A","var(--pinA)"]].forEach(([n,letter,col]) => {
+    if (!n || !XY[n]) return;
+    const {x,y} = XY[n];
+    s += '<g><circle class="pin-ring" cx="' + x + '" cy="' + y + '" r="15" fill="' + col + '"></circle>' +
+      '<g class="pin-body"><circle cx="' + x + '" cy="' + y + '" r="15" fill="' + col + '" stroke="var(--card)" stroke-width="3"></circle>' +
+      '<text x="' + x + '" y="' + (y+6) + '" text-anchor="middle" fill="#fff" font-size="17" font-weight="800">' +
+      letter + '</text></g></g>';
+  });
+  document.getElementById("pins").innerHTML = s;
+}
+
+let $flow = null, $train = null;                   // anch'essi nascono con buildMap()
+let raf = null;
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function flowD(pat){
+  let d = "";
+  pat.legs.forEach((l,i) => {
+    const e = EDGE_BY[ekey(l.l, l.from, l.to)];
+    const seg = roundPath(e.a === l.from ? e.p : e.p.slice().reverse());
+    d += i === 0 ? seg : " L" + seg.slice(1);
+  });
+  return d;
+}
+function runTrain(){
+  cancelAnimationFrame(raf);
+  const d = $flow.getAttribute("d");
+  if (!d){ $train.innerHTML = ""; return; }
+  const len = $flow.getTotalLength();
+  if (!len){ $train.innerHTML = ""; return; }
+  $train.innerHTML = '<g id="tg"><rect x="-14" y="-6.5" width="28" height="13" rx="6" fill="var(--ink)" ' +
+    'stroke="var(--card)" stroke-width="2.5"></rect><path d="M5,-3.5 L10,0 L5,3.5" fill="none" ' +
+    'stroke="var(--card)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g>';
+  const g = document.getElementById("tg");
+  const place = u => {
+    const a = $flow.getPointAtLength(u * len), b = $flow.getPointAtLength(Math.min(len, u * len + 3));
+    g.setAttribute("transform", "translate(" + a.x + "," + a.y + ") rotate(" +
+      (Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI) + ")");
+  };
+  if (REDUCED || !CFG.anim){ place(0.5); return; }
+  const dur = Math.max(3000, len * 5.5), t0 = performance.now();
+  (function step(now){ place(((now - t0) % dur) / dur); raf = requestAnimationFrame(step); })(t0);
+}
+
+function paintMap(pats, activePi){
+  const active = pats.length > 0 && activePi !== null;
+  const onE = new Set(), altE = new Set(), stn = new Set(), lnOn = new Set(), lnAlt = new Set();
+  if (active){
+    pats[activePi].legs.forEach(l => { onE.add(ekey(l.l,l.from,l.to)); stn.add(l.from); stn.add(l.to); lnOn.add(l.l); });
+    pats.forEach((p,i) => { if (i !== activePi) p.legs.forEach(l => {
+      const k = ekey(l.l,l.from,l.to);
+      if (!onE.has(k)){ altE.add(k); if (!lnOn.has(l.l)) lnAlt.add(l.l); }
+      stn.add(l.from); stn.add(l.to);
+    });});
+  }
+  $net.querySelectorAll(".edge").forEach(el => { const k = el.dataset.edge;
+    el.classList.toggle("on", onE.has(k));
+    el.classList.toggle("alt", altE.has(k));
+    el.classList.toggle("dim", active && !onE.has(k) && !altE.has(k));
+  });
+  $net.querySelectorAll(".mk").forEach(el => el.classList.toggle("dim", active && !stn.has(el.dataset.stn)));
+  $net.querySelectorAll(".lb").forEach(el => el.classList.toggle("dim", active && !stn.has(el.dataset.stn)));
+  const mode = CFG.times;
+  $net.querySelectorAll(".tm[data-tm]").forEach(el => {
+    const show = mode === "always" ? true : mode === "idle" ? !active : (active && onE.has(el.dataset.tm));
+    el.classList.toggle("hide", !show);
+  });
+
+  $legend.querySelectorAll(".lgi").forEach(el => {
+    const k = el.dataset.line;
+    el.classList.toggle("alt", active && lnAlt.has(k));
+    el.classList.toggle("dim", active && !lnOn.has(k) && !lnAlt.has(k));
+  });
+  document.getElementById("lgnote").textContent =
+    active && lnAlt.size ? "tratteggio = linea usata solo dai percorsi alternativi" : "";
+
+  document.getElementById("maproute").textContent = active
+    ? S.from + "  →  " + S.to : "Rete completa · tempi in minuti su ogni tratta";
+  $flow.setAttribute("d", active ? flowD(pats[activePi]) : "");
+  runTrain();
+  drawPins();
+}
+
+/* ══════════ MODALI ══════════ */
+const $modal = document.getElementById("modal");
+function openModal(title, html){
+  document.getElementById("mtitle").textContent = title;
+  document.getElementById("mbody").innerHTML = html;
+  $modal.hidden = false;
+}
+const closeModal = () => { $modal.hidden = true; };
+document.getElementById("mclose").onclick = closeModal;
+document.getElementById("mbd").onclick = closeModal;
+document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeModal(); closePops(); } });
+
+const SET_DEF = [
+  {k:"theme", name:"Tema", desc:"Chiaro, scuro o allineato alle preferenze del sistema operativo.",
+   opts:[["light","Chiaro"],["dark","Scuro"],["system","Sistema"]]},
+  {k:"cb", name:"Palette", desc:"La modalità daltonici usa i colori Okabe–Ito, distinguibili con deuteranopia e protanopia.",
+   opts:[[0,"Standard"],[1,"Daltonici"]]},
+  {k:"sea", name:"Mare e coste", desc:"Disegna il Mediterraneo e il profilo dell'isola sotto lo schema.",
+   opts:[[1,"Sì"],[0,"No"]]},
+  {k:"times", name:"Tempi di percorrenza", desc:"Quando mostrare i minuti sulle tratte della mappa.",
+   opts:[["always","Sempre"],["idle","Solo a vuoto"],["planning","Solo in ricerca"]]},
+  {k:"alts", name:"Percorsi alternativi", desc:"Cerca anche itinerari diversi dal più veloce e li mostra punteggiati.",
+   opts:[[1,"Sì"],[0,"No"]]},
+  {k:"anim", name:"Animazioni", desc:"Treno in movimento, tratteggio scorrevole e comparsa dei segnaposto.",
+   opts:[[1,"Sì"],[0,"No"]]},
+  {k:"dream", name:"Il sogno di Matteo 💫", desc:"Fai succedere l'impossibile.",
+   opts:[[0,"No"],[1,"Sì"]]}
+];
+document.getElementById("btnSet").onclick = () => {
+  openModal("Impostazioni", SET_DEF.map(s =>
+    '<div class="srow"><div><div class="sname">' + s.name + '</div><div class="sdesc">' + s.desc + '</div></div>' +
+    '<div class="seg" data-k="' + s.k + '">' + s.opts.map(o =>
+      '<button data-v="' + o[0] + '"' + (String(CFG[s.k]) === String(o[0]) ? ' class="on"' : '') + '>' + o[1] + '</button>'
+    ).join("") + '</div></div>').join(""));
+  document.getElementById("mbody").addEventListener("click", e => {
+    const b = e.target.closest("button[data-v]"); if (!b) return;
+    const k = b.parentElement.dataset.k, v = b.dataset.v;
+    CFG[k] = (v === "0" || v === "1") ? +v : v;
+    b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+    if (k === "dream"){
+      S.pork = Math.random();                       // nuova estrazione a ogni attivazione
+      if (!CFG.dream){                              // la Calabria svanisce, e con lei la sua stazione
+        if (S.from === "Reggio Calabria"){ S.from = ""; selFrom.set(""); }
+        if (S.to   === "Reggio Calabria"){ S.to   = ""; selTo.set(""); }
+        S.selKey = null;
+      }
+    }
+    applyCfg(); if (READY) render();
+  });
+};
+
+document.getElementById("btnLines").onclick = () => READY && openModal("Linee e orari",
+  Object.keys(SERVICE).filter(k => CFG.dream || !LINES[k].dream).map(k => {
+    const s = SERVICE[k], tot = s.hop.reduce((a,b) => a+b, 0);
+    let cum = 0;
+    const rows = s.stops.map((st,i) => {
+      const hop = i ? s.hop[i-1] : null;
+      if (i) cum += hop;
+      return '<tr><td>' + esc(st) + '</td><td class="n">' + (i ? "+" + hop + "'" : "—") +
+        '</td><td class="n">' + (i ? hhmm(cum) : "0h00") + '</td></tr>';
+    }).join("");
+    const fwd = TRAINS.filter(t => t.line === k && t.dir === 1);
+    const bwd = TRAINS.filter(t => t.line === k && t.dir === -1);
+    const chips = arr => arr.map(t => '<span class="dep">' + toStr(t.seq[0].t) + '</span>').join("");
+    return '<div class="lncard"><div class="lnhead"><span class="lndot" style="background:' + LINES[k].v + '"></span>' +
+      '<span class="lnname">' + LINES[k].n + '</span><span class="badge neutral">' + hhmm(tot) + ' capolinea–capolinea</span></div>' +
+      '<div class="lnmeta">' + esc(s.stops[0]) + ' ↔ ' + esc(s.stops[s.stops.length-1]) +
+      ' · cadenza ' + (s.peak ? s.peak + "' in punta, " + s.every + "' fuori punta" : s.every + " minuti") +
+      ' · ' + (fwd.length + bwd.length) + ' corse al giorno</div>' +
+      '<table class="tt"><tr><th>Fermata</th><th style="text-align:right">Tratta</th><th style="text-align:right">Dal capolinea</th></tr>' +
+      rows + '</table>' +
+      '<div class="lnmeta" style="margin:12px 0 0">Partenze da ' + esc(s.stops[0]) + '</div><div class="deps">' + chips(fwd) + '</div>' +
+      '<div class="lnmeta" style="margin:10px 0 0">Partenze da ' + esc(s.stops[s.stops.length-1]) + '</div><div class="deps">' + chips(bwd) + '</div>' +
+      '</div>';
+  }).join(""));
+
+/* ─── MODIFICA QUI: testo della pagina Info ─── */
+const INFO_HTML = `
+<div class="infobody">
+  <h3>Che cos'è</h3>
+  <p>Un pianificatore di viaggio per una rete ad alta velocità siciliana che <strong>non esiste</strong>.
+  Sei linee, diciotto fermate, ventitré tratte e un orario cadenzato completo: scegli partenza e arrivo
+  e ottieni corse, coincidenze, cambi e tempi di attesa come faresti su un sito ferroviario vero.
+  Solo che i treni non ci sono.</p>
+
+  <h3>Perché l'ho fatto</h3>
+  <p>Un po' per divertimento, perché disegnare una rete è un gioco bellissimo: decidere dove passa una linea,
+  quanto ci mette, a che ora parte il primo treno.</p>
+
+  <p>Un po' per curiosità tecnica. Volevo vedere fin dove arriva Claude se gli chiedi una cosa intera e non
+  un frammento: la geometria della mappa, le coste in proiezione, l'algoritmo che cerca le coincidenze,
+  il calcolo dei percorsi alternativi. Buona parte di quello che stai usando è nata così.</p>
+
+  <p>Un po' — parecchio — per satira. La cosa più istruttiva di questo progetto non è quanto sia bello
+  l'orario: è quanto sia <em>ordinario</em>. Non c'è niente di visionario qui dentro. Non ci sono treni a
+  levitazione magnetica né tunnel sotto l'Etna: c'è una regione in cui da un capoluogo si arriva a un altro
+  capoluogo in un'ora e mezza, cambiando al massimo una volta, con partenze a ogni ora tonda. È il minimo
+  sindacale di qualunque regione europea, ed è diventato materiale da fantascienza solo perché siamo noi.
+  C'è anche, nelle impostazioni, un interruttore che accende l'unica opera di cui si parla davvero:
+  lasciarlo spento è il senso di tutto il resto.</p>
+
+  <p>E soprattutto perché credo valga la pena dirlo ad alta voce, agli italiani e a chi governa in
+  particolare: le priorità della Sicilia non sono un monumento, sono i pendolari, gli studenti fuori sede,
+  i turisti che atterrano a Palermo e devono raggiungere Agrigento, i paesi dell'interno che si svuotano
+  perché arrivarci è una impresa. Un binario elettrificato e a doppio senso vale più di qualunque cerimonia
+  di inaugurazione. La Sicilia è una regione fantastica e merita un'infrastruttura altrettanto fantastica.</p>
+
+  <h3>Come funziona</h3>
+  <ul>
+    <li>La rete è un grafo di 18 fermate e 23 tratte; il percorso si calcola con Dijkstra sugli stati
+        (stazione, linea), così ogni cambio treno costa davvero.</li>
+    <li>Le alternative si ottengono escludendo a turno una tratta del percorso migliore.</li>
+    <li>L'orario nasce da cadenzamenti dichiarati per linea, con distinzione fra ore di punta e di morbida.</li>
+    <li>Coincidenza minima: 8 minuti.</li>
+  </ul>
+
+  <h3>I dati</h3>
+  <p>Linee, cadenze e tempi stanno fuori dal codice, in due file accanto alla pagina:</p>
+  <ul>
+    <li><strong>orari-linee.json</strong> — per ogni linea: nome, colore, fermate in sequenza, cadenza
+        (con quella di punta dove prevista) e prima e ultima partenza nei due sensi.</li>
+    <li><strong>tempi-percorrenza.json</strong> — i minuti fra fermate adiacenti, più la coincidenza minima.
+        È l'unica fonte: gli stessi valori compaiono sulla mappa e dentro l'orario, quindi non possono
+        divergere.</li>
+  </ul>
+  <p>Nel codice restano la geometria dello schema e i colori delle linee, che sono variabili CSS.</p>
+
+  <h3>Crediti</h3>
+  <p>Idea, rete, orario e testi: <strong>agateeno</strong>.</p>
+  <p>Scritto insieme a <strong>Claude</strong> di Anthropic, che ha messo il grosso del codice: il
+  tracciamento della mappa, la ricerca dei percorsi e la generazione dell'orario dai cadenzamenti.
+  Metterne alla prova le capacità era una delle ragioni del progetto, quindi sarebbe scorretto non dirlo.</p>
+  <p>Nessuna libreria, nessun framework, nessuna CDN, nessun font remoto, nessuna analitica, nessun cookie.
+  Le uniche letture di rete sono i due file JSON degli orari, che stanno nella stessa cartella della pagina.
+  I caratteri sono quelli di sistema, le icone sono emoji Unicode. Non c'è niente da attribuire a
+  terzi perché non c'è niente di terzi.</p>
+
+  <h3>Licenza</h3>
+  <p>Licenza <strong>MIT</strong>: puoi usare, modificare e ridistribuire tutto, anche per farci soldi,
+  purché resti l'avviso di copyright. Forka, cambia i tempi, aggiungi la tua linea, disegna la tua regione.
+  Se ne fai qualcosa mi fa piacere saperlo.</p>
+
+  <h3>Contatti</h3>
+  <p>Codice, segnalazioni e proposte di modifica:
+  <a href="https://github.com/agateeno" target="_blank" rel="noopener">github.com/agateeno</a>.</p>
+
+  <h3>Colophon</h3>
+  <p>Pagina singola in HTML, CSS e JavaScript, senza librerie né servizi di terze parti: le uniche letture
+  di rete sono i due JSON degli orari, presi dalla stessa cartella. Su GitHub Pages funziona senza
+  configurazione; in locale serve un server (per esempio <code>python3 -m http.server</code>), perché
+  i browser non permettono di leggere file affiancati a una pagina aperta con doppio clic.</p>
+</div>`;
+document.getElementById("btnInfo").onclick = () => openModal("Informazioni", INFO_HTML);
+
+/* ══════════ RENDER ══════════ */
+let selFrom = null, selTo = null;                  // creati dopo il caricamento: servono le stazioni delle linee
+let READY = false;                                 // finché i JSON non sono caricati i comandi restano inerti
+const $out = document.getElementById("result");
+
+document.getElementById("seg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || !READY) return;
+  S.mode = b.dataset.m; S.selKey = null; S.limit = 7;
+  document.querySelectorAll("#seg button").forEach(x => x.classList.toggle("on", x === b));
+  document.getElementById("tLabel").textContent = S.mode === "dep" ? "Ora di partenza" : "Ora di arrivo";
+  document.getElementById("segHint").textContent = S.mode === "dep"
+    ? "Ti mostro i treni in partenza da quell'ora in poi."
+    : "Ti mostro i treni che arrivano entro quell'ora, e a che ora devi partire.";
+  render();
+});
+
+const SORTS = {
+  dep:{n:"Ora di partenza", f:(a,b) => a.dep - b.dep || a.arr - b.arr},
+  arr:{n:"Ora di arrivo",   f:(a,b) => a.arr - b.arr || a.dep - b.dep},
+  dur:{n:"Durata",          f:(a,b) => a.dur - b.dur || a.dep - b.dep},
+  chg:{n:"Numero di cambi", f:(a,b) => (a.legs.length - b.legs.length) || a.dur - b.dur || a.dep - b.dep}
+};
+
+function render(){
+  const pats = patterns(S.from, S.to);
+  const all = (S.from && S.to && S.from !== S.to) ? dailyServices(S.from, S.to) : [];
+
+  if (!all.length){
+    paintMap(pats, null);
+    $out.innerHTML = '<div class="empty">' + (S.from && S.to && S.from === S.to
+      ? "Partenza e arrivo coincidono: scegli due stazioni diverse."
+      : "Seleziona partenza e arrivo per vedere l'orario della giornata.") + '</div>';
+    return;
+  }
+
+  const pool = S.mode === "dep" ? all.filter(j => j.dep >= S.time) : all.filter(j => j.arr <= S.time);
+  const win  = S.mode === "dep" ? pool.slice(0, S.limit) : pool.slice(-S.limit);
+
+  if (!win.length){
+    paintMap(pats, null);
+    $out.innerHTML = '<div class="empty">' + (S.mode === "dep"
+      ? "Nessun treno dopo le " + toStr(S.time) + ". L'ultima partenza della giornata è alle " + toStr(all[all.length-1].dep) + "."
+      : "Nessun treno arriva entro le " + toStr(S.time) + ". Il primo arrivo della giornata è alle " + toStr(all[0].arr) + ".") + '</div>';
+    return;
+  }
+
+  const list = win.slice().sort(SORTS[S.sort].f);
+  const fastest = Math.min(...win.map(j => j.dur));
+
+  // il collegamento proposto è sempre il primo dell'elenco come lo stai ordinando
+  let sel = list.find(j => j.key === S.selKey) || list[0];
+  S.selKey = sel.key;
+  paintMap(pats, sel.pi);
+
+  const porkIdx = CFG.dream && list.length ? Math.floor(S.pork * list.length) % list.length : -1;
+
+  const rows = list.map((j,ix) => {
+    const ch = j.legs.length - 1;
+    const badges = (j.dur === fastest ? '<span class="fast">Più veloce</span>' : '') +
+                   (ix === porkIdx ? '<span class="pork">Sagra della porchetta 🐖</span>' : '');
+    return '<div class="row' + (j.key === sel.key ? " on" : "") + '" data-k="' + esc(j.key) + '">' +
+      '<div class="times"><span class="tt-h">' + toStr(j.dep) + '</span><span class="tt-dash"></span>' +
+      '<span class="tt-h">' + toStr(j.arr) + '</span></div>' +
+      '<div class="mid"><div class="d">' + hhmm(j.dur) + ' · ' +
+        (ch === 0 ? "diretto" : ch + (ch === 1 ? " cambio" : " cambi") +
+          ' · <span class="w">' + j.wait + " min di attesa</span>") + '</div>' +
+      '<div class="v">' + esc(viaOf(j.pat)) + '</div>' +
+      (badges ? '<div class="badges">' + badges + '</div>' : '') + '</div>' +
+      '<div class="trainids">' + j.legs.map(l => '<span class="tid" style="background:' +
+        LINES[l.line].v + '">' + l.id + '</span>').join("") + '</div></div>';
+  }).join("");
+
+  // dettaglio: ogni fermata servita, con la fascia colorata della linea
+  const legsHtml = sel.legs.map((l,i) => {
+    const tr = TRAIN_BY[l.id];
+    const stops = tr.seq.slice(tr.idx[l.from], tr.idx[l.to] + 1);
+    const col = LINES[l.line].v;
+    let out = "";
+    if (i){
+      out += '<div class="tl-row chg"><div class="tl-t"></div><div class="tl-rail"></div>' +
+             '<div class="tl-w">↻ Cambio treno · attesa ' + (l.dep - sel.legs[i-1].arr) + ' min</div></div>';
+    }
+    out += stops.map((s,k) => {
+      const cls = k === 0 ? "first" : k === stops.length-1 ? "last" : "mid";
+      let r = '<div class="tl-row ' + cls + '" style="--lc:' + col + '">' +
+        '<div class="tl-t">' + toStr(s.t) + '</div>' +
+        '<div class="tl-rail"><span class="tl-dot"></span></div>' +
+        '<div class="tl-n">' + esc(s.n) + '</div></div>';
+      if (k === 0) r += '<div class="tl-row" style="--lc:' + col + '"><div class="tl-t"></div>' +
+        '<div class="tl-rail"></div><div class="tl-meta" style="color:' + col + '">' +
+        LINES[l.line].n + ' · ' + l.id + ' · ' + short(l.arr - l.dep) + '</div></div>';
+      return r;
+    }).join("");
+    return out;
+  }).join("");
+
+  const remaining = pool.length - win.length;
+
+  $out.innerHTML =
+    /* ── card 1: riepilogo del viaggio scelto ── */
+    '<div class="card sum">' +
+      '<div><div class="caplab">' + (S.mode === "arr" ? "Devi partire alle" : "Partenza") + '</div>' +
+      '<div class="big' + (S.mode === "arr" ? " hl" : "") + '">' + toStr(sel.dep) + '</div></div>' +
+      '<div><div class="caplab">' + (S.mode === "dep" ? "Arrivo stimato" : "Arrivo") + '</div>' +
+      '<div class="big' + (S.mode === "dep" ? " hl" : "") + '">' + toStr(sel.arr) + '</div></div>' +
+      '<div><div class="caplab">Durata</div><div class="big">' + hhmm(sel.dur) + '</div></div>' +
+      '<div style="margin-left:auto">' + (sel.dur === fastest
+        ? '<span class="badge ok">Il più veloce della fascia</span>'
+        : '<span class="badge neutral">' + (sel.legs.length-1) + ' cambi · ' + sel.wait + ' min di attesa</span>') +
+      '</div>' +
+    '</div>' +
+
+    '<div class="res2">' +
+      /* ── card 2: elenco dei collegamenti ── */
+      '<div class="card listcard">' +
+        '<div class="tth"><span class="t">' + win.length + ' di ' + all.length + ' collegamenti</span>' +
+          '<div class="sort"><span class="sl">Ordina per</span>' +
+          '<div class="cs sortsel" id="sortSel">' +
+            '<button class="cs-btn" type="button"><span class="cs-val">' + SORTS[S.sort].n + '</span>' +
+            '<span class="cs-chev">▼</span></button>' +
+            '<div class="cs-pop">' + Object.keys(SORTS).map(k =>
+              '<div class="cs-opt' + (k === S.sort ? " sel" : "") + '" data-s="' + k + '">' +
+              '<span class="nm">' + SORTS[k].n + '</span></div>').join("") + '</div>' +
+          '</div></div></div>' +
+        rows +
+        (remaining > 0 ? '<button class="more" id="more">Mostra altri ' + Math.min(remaining,7) + ' orari</button>' : '') +
+      '</div>' +
+
+      /* ── card 3: dettaglio del collegamento scelto ── */
+      '<div class="card detail">' +
+        '<div class="tth"><span class="t">Dettaglio del viaggio</span>' +
+          '<span class="t">' + esc(S.from.replace(/ ✈$/," ✈")) + ' → ' + esc(S.to) + '</span></div>' +
+        '<div class="legs">' + legsHtml + '</div>' +
+      '</div>' +
+    '</div>';
+
+  const ss = document.getElementById("sortSel");
+  ss.addEventListener("click", e => {
+    e.stopPropagation();
+    const o = e.target.closest("[data-s]");
+    if (o){ S.sort = o.dataset.s; render(); return; }
+    const was = ss.classList.contains("open");
+    closePops(); if (!was) ss.classList.add("open");
+  });
+
+  $out.querySelectorAll(".row").forEach(r => r.addEventListener("click", () => { S.selKey = r.dataset.k; render(); }));
+  const mb = document.getElementById("more");
+  if (mb) mb.addEventListener("click", () => { S.limit += 7; render(); });
+}
+
+document.getElementById("swap").addEventListener("click", () => {
+  if (!READY) return;
+  const a = S.from; S.from = S.to; S.to = a;
+  selFrom.set(S.from); selTo.set(S.to); S.selKey = null; S.limit = 7; render();
+});
+document.getElementById("reset").addEventListener("click", () => {
+  if (!READY) return;
+  S.from = ""; S.to = ""; S.selKey = null; S.limit = 7;
+  selFrom.set(""); selTo.set(""); render();
+});
+$net.addEventListener("click", ev => {
+  if (moved > 8 || !READY) return;
+  const el = ev.target.closest("[data-hit]"); if (!el) return;
+  const n = el.dataset.hit;
+  if (n === S.from) S.from = "";
+  else if (n === S.to) S.to = "";
+  else if (!S.from) S.from = n;
+  else if (!S.to) S.to = n;
+  else { S.from = n; S.to = ""; }
+  selFrom.set(S.from); selTo.set(S.to); S.selKey = null; S.limit = 7; render();
+});
+
+/* ══════════ AVVIO ══════════ */
+async function getJSON(url){
+  let r;
+  try { r = await fetch(url, {cache:"no-cache"}); }
+  catch(e){ throw new Error("Impossibile leggere " + url + " (" + e.message + ")"); }
+  if (!r.ok) throw new Error(url + ": il server ha risposto " + r.status + " " + r.statusText);
+  try { return await r.json(); }
+  catch(e){ throw new Error(url + " non è JSON valido: " + e.message); }
+}
+
+function showDataError(err){
+  const fromFile = location.protocol === "file:";
+  $out.innerHTML = '<div class="empty"><strong>Orari non caricati.</strong><br>' + esc(err.message) +
+    (fromFile
+      ? '<br><br>La pagina legge linee e tempi da due file JSON, e i browser vietano di leggerli quando ' +
+        'l\'HTML è aperto direttamente da disco. Avvia un server nella cartella del progetto — per esempio ' +
+        '<code>python3 -m http.server</code> — e apri la pagina da <code>http://localhost:8000/</code>.'
+      : '<br><br>Controlla che <code>' + esc(DATA.orari) + '</code> e <code>' + esc(DATA.tempi) +
+        '</code> stiano nella stessa cartella di questa pagina.') + '</div>';
+  document.querySelector(".mapcard").hidden = true;   // senza rete non c'è schema da mostrare
+  document.querySelector(".panel").hidden = true;     // né stazioni fra cui scegliere
+}
+
+async function boot(){
+  try {
+    const [tempi, orari] = await Promise.all([getJSON(DATA.tempi), getJSON(DATA.orari)]);
+    loadOrari(orari, loadTempi(tempi));
+    buildTrains();
+    buildGraph();
+    buildMap();
+    buildLegend();
+    selFrom = makeSelect(document.getElementById("csFrom"), v => { S.from = v; S.selKey = null; S.limit = 7; render(); });
+    selTo   = makeSelect(document.getElementById("csTo"),   v => { S.to = v;   S.selKey = null; S.limit = 7; render(); });
+    makeTime(document.getElementById("tpTime"), S.time, v => { S.time = v; S.selKey = null; S.limit = 7; render(); });
+    READY = true;
+    render();
+  } catch(err){
+    console.error(err);
+    showDataError(err);
+  }
+}
+
+applyCfg();
+boot();
+</script>
+</body>
+</html>
